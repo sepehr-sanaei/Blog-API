@@ -21,12 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-!qh^9d1)&mp+)0lxu=7_rrnu&7^&x#4e-^l2lo*@5lnp_82^i7')
+SECRET_KEY = config('SECRET_KEY', default='test')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=True)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast = lambda v: [item.strip() for item in v.split(',')], default='*')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS',
+                       cast=lambda v: [item.strip() for item in v.split(',')],
+                       default='*')
 
 
 # Application definition
@@ -145,4 +147,3 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False)
 EMAIL_PORT = config('EMAIL_HOST', cast=int, default=25)
 EMAIL_HOST_USER = config('EMAIL_HOST', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST', default='')
-
