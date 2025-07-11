@@ -124,8 +124,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -147,3 +147,6 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False)
 EMAIL_PORT = config('EMAIL_HOST', cast=int, default=25)
 EMAIL_HOST_USER = config('EMAIL_HOST', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST', default='')
+
+# Custom User
+AUTH_USER_MODEL = 'accounts.User'
