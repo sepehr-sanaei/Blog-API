@@ -1,10 +1,15 @@
 """
 Database models for accounts app.
 """
+import random
+import string
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth.models import (
     BaseUserManager,
     AbstractBaseUser,
@@ -103,3 +108,33 @@ def create_profile(sender, instance, created, **kwargs):
     """Create profile automatically when the user is created."""
     if created:
         Profile.objects.create(user=instance, pk=instance.id)
+
+
+class OTP(models.Model):
+    """OTP database model."""
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name='otp'
+    )
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def is_expired(self):
+        """Checks if the OTP is expired."""
+        return timezone.now() > self.expires_at
+
+    def __str__(self):
+        """Sting representation of model."""
+        return f'OTP for {self.user.email}'
+
+    def generate_otp_code(self):
+        """Generate a random 6-digit OTP code."""
+        return ''.join(random.choices(string.digits, k=6))
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = self.generate_otp_code()
+        self.expires_at = timezone.now() + timedelta(minutes=2)
+        super().save(*args, **kwargs)

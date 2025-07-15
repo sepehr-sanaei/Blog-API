@@ -14,12 +14,17 @@ services:
       - POSTGRES_PASSWORD=postgres
     restart: always
 
+  redis:
+    image: redis:8.0.2-alpine
+
+
   backend:
     container_name: backend
     build:
       context: .
     working_dir: /app
     command: sh -c "python manage.py wait_for_db &&
+                    python manage.py migrate &&
                     python manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
@@ -27,9 +32,26 @@ services:
       - ./core:/app
     environment:
       - DEBUG=True
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     restart: always
     depends_on:
       - db
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+    command: celery -A core worker -l INFO
+    volumes:
+      - ./core:/app
+    environment:
+    - DEBUG=True
+    - CELERY_BROKER_URL=redis://redis:6379/0
+    - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
 
   smtp4dev:
     image: rnwood/smtp4dev:v3
